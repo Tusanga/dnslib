@@ -1,7 +1,7 @@
 name					"dnslib"
 description				"A DNS lookup library and command-line application."
 authors					"Adam Williams"
-copyright				"Copyright © 2020-2021, Adam Williams"
+copyright				"Copyright © 2020-2023, Adam Williams"
 license					"MIT"
 
 dependency				"vibe-core"		version="~>1.9"
@@ -17,6 +17,19 @@ configuration "lib" {
    dependency			"vibe-d:stream"	version="~>0.9"
    dependency			"vibe-d:tls"	version="~>0.9"
    subConfiguration		"vibe-d:tls"	"openssl-1.1"
+}
+
+configuration "lib-ssl3" {
+   targetType			"library"
+   //lflags				"-L/usr/local/lib/"
+   targetPath			"lib"
+   sourcePaths			"source/"
+   excludedSourceFiles	"source/app.d"
+   versions				"ENABLE_TLS"
+
+   dependency			"vibe-d:stream"	version="~>0.9"
+   dependency			"vibe-d:tls"	version="~>0.9"
+   subConfiguration		"vibe-d:tls"	"openssl"
 }
 
 configuration "lib-no-tls" {
@@ -36,6 +49,17 @@ configuration "app" {
    dependency			"vibe-d:stream"	version="~>0.9"
    dependency			"vibe-d:tls"	version="~>0.9"
    subConfiguration		"vibe-d:tls"	"openssl-1.1"
+}
+
+configuration "app-ssl3" {
+   targetType			"executable"
+   targetName			"dnslookup"
+   mainSourceFile		"source/app.d"
+   versions				"ENABLE_TLS"
+
+   dependency			"vibe-d:stream"	version="~>0.9"
+   dependency			"vibe-d:tls"	version="~>0.9"
+   subConfiguration		"vibe-d:tls"	"openssl"
 }
 
 configuration "app-no-tls" {
