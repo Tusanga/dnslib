@@ -51,7 +51,7 @@ unittest
 
 // ---------------------------------------------------------------------
 
-// Simpel check for legal domain name elements	
+// Simple check for legal domain name elements (including underscore in accordance RFC 2872)
 bool noIllegalCharacters(ref string s)
 {
 	if ((s.length == 0) || (s[0] == '-') || (s[$-1] == '-'))
@@ -60,7 +60,7 @@ bool noIllegalCharacters(ref string s)
 	}
 	
 	import std.regex;
-	auto rx = ctRegex!(r"^[0-9a-zA-Z-]{1,64}$");  // Length requirement (64) can be tightened. 
+	auto rx = ctRegex!(r"^(?:_|[_0-9a-zA-Z-](?:[0-9a-zA-Z-]{1,63})?(?<=[0-9a-zA-Z]))$");  // Length requirement (64) can be tightened.
 
 	auto capture = matchFirst(s, rx);
 	return (!capture.empty);  		
@@ -84,6 +84,18 @@ unittest
 	assert( noIllegalCharacters(s));
 
 	s = "-a1";
+	assert(!noIllegalCharacters(s));
+
+	s = "_a1";
+	assert( noIllegalCharacters(s));
+
+	s = "_a_1";
+	assert(!noIllegalCharacters(s));
+
+	s = "a1-";
+	assert(!noIllegalCharacters(s));
+
+	s = "a1_";
 	assert(!noIllegalCharacters(s));
 
 	s = "0123456789012345678901234567890123456789012345678901234567890123";
