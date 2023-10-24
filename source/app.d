@@ -197,7 +197,7 @@ int main(string[] args)
 		string line;
 		if ((line = readln()) is null)
 		{
-			writeln("Uable to read stdin line");
+			writeln("Unable to read stdin line");
 			return EXIT_FAILURE;
 		}     
 
