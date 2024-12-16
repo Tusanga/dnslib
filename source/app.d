@@ -196,7 +196,7 @@ int main(string[] args)
     string line;
     if ((line = readln()) is null)
     {
-      writeln("Uable to read stdin line");
+      writeln("Unable to read stdin line");
       return EXIT_FAILURE;
     }
 
@@ -240,7 +240,7 @@ int main(string[] args)
   dnsParserResult requestParserResult = dnsParse(requestData, requestMessage, dnsOptions.printParsing);
   if (requestParserResult != dnsParserResult.success)
   {
-    writefln("Parsning error: %s", requestParserResult);
+    writefln("Parsing error: %s", requestParserResult);
     return EXIT_FAILURE;
   }
 
@@ -310,7 +310,7 @@ int main(string[] args)
   dnsParserResult responseParserResult = dnsParse(responseData, responseMessage, dnsOptions.printParsing);
   if (responseParserResult != dnsParserResult.success)
   {
-    writefln("Parsning error: %s", responseParserResult);
+    writefln("Parsing error: %s", responseParserResult);
     return EXIT_FAILURE;
   }
 

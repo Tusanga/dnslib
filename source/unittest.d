@@ -276,7 +276,7 @@ unittest
   auto responseParserResult = dnsParse(responseData, responseMessage, printParsing);
   if (responseParserResult != dnsParserResult.success)
   {
-    writefln("PARSNING ERROR: %s", responseParserResult);
+    writefln("PARSING ERROR: %s", responseParserResult);
     exit(EXIT_FAILURE);
   }
 
