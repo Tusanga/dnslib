@@ -243,12 +243,12 @@ dnsParserResult dnsParse(const ref ubyte[] input, ref dnsMessage myDnsMessage, b
 
       else if (myResponseSection.responseType == dnsType.TXT)
       {
-			  while(inputPtr < oldInputPtr + myResponseSection.responseDataLength)
+        while(inputPtr < oldInputPtr + myResponseSection.responseDataLength)
         {
-				  string characterString = readCharacterString(input);
-				  myResponseSection.responseElements ~= characterString;
-				  myResponseSection.responseString ~= characterString;
-			  }
+          string characterString = readCharacterString(input);
+          myResponseSection.responseElements ~= characterString;
+          myResponseSection.responseString ~= characterString;
+        }
       }
 
       else if (myResponseSection.responseType == dnsType.CNAME
