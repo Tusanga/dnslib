@@ -16,7 +16,7 @@ buildallforce:
 	dub build --force --config=app
 	dub build --force --config=lib-no-tls
 	dub build --force --config=lib
-	
+
 testall:
 	dub test --config=app-no-tls
 	dub test --config=app

@@ -45,7 +45,7 @@ Output raw request and response messages
 
 Use raw request message for lookup.
 
-	echo "5b1f0100000100000000000003777777057961686f6f03636f6d0000010001" | ./dnslookup --hexstdin 
+	echo "5b1f0100000100000000000003777777057961686f6f03636f6d0000010001" | ./dnslookup --hexstdin
 
 Use raw response message without lookup. This will parse the response message (see 'QR: response') even though it says 'PRINTING REQUEST MESSAGE' and 'VALIDATING REQUEST MESSAGE: header_wrong_query_response'.
 

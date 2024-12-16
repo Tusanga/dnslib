@@ -1,45 +1,47 @@
-name					"dnslib"
-description				"A DNS lookup library and command-line application."
-authors					"Adam Williams"
-copyright				"Copyright © 2020-2021, Adam Williams"
-license					"MIT"
+name            "dnslib"
+description     "A DNS lookup library and command-line application."
+authors         "Adam Williams"
+copyright       "Copyright © 2020-2024, Adam Williams"
+license         "MIT"
 
-dependency				"vibe-core"		version="~>1.9"
+dependency      "vibe-core" version="~>2.9.6"
 
 configuration "lib" {
-   targetType			"library"
-   //lflags				"-L/usr/local/lib/"
-   targetPath			"lib"
-   sourcePaths			"source/"
-   excludedSourceFiles	"source/app.d"
-   versions				"ENABLE_TLS"
+   targetType           "library"
+   //lflags             "-L/usr/local/lib/"
+   targetPath           "lib"
+   sourcePaths          "source/"
+   excludedSourceFiles  "source/app.d"
+   versions             "ENABLE_TLS"
 
-   dependency			"vibe-d:stream"	version="~>0.9"
-   dependency			"vibe-d:tls"	version="~>0.9"
-   subConfiguration		"vibe-d:tls"	"openssl-1.1"
+   dependency           "vibe-stream"     version="~>1.1.1"
+   dependency           "vibe-stream:tls" version="~>1.1.1"
+   subConfiguration     "vibe-stream:tls" "openssl"
+   dependency           "openssl"         version="~>3.1"
 }
 
 configuration "lib-no-tls" {
-   targetType			"library"
-   //lflags				"-L/usr/local/lib/"
-   targetPath			"lib"
-   sourcePaths			"source/"
-   excludedSourceFiles	"source/app.d"
+   targetType           "library"
+   //lflags             "-L/usr/local/lib/"
+   targetPath           "lib"
+   sourcePaths          "source/"
+   excludedSourceFiles  "source/app.d"
 }
 
 configuration "app" {
-   targetType			"executable"
-   targetName			"dnslookup"
-   mainSourceFile		"source/app.d"
-   versions				"ENABLE_TLS"
+   targetType           "executable"
+   targetName           "dnslookup"
+   mainSourceFile       "source/app.d"
+   versions             "ENABLE_TLS"
 
-   dependency			"vibe-d:stream"	version="~>0.9"
-   dependency			"vibe-d:tls"	version="~>0.9"
-   subConfiguration		"vibe-d:tls"	"openssl-1.1"
+   dependency           "vibe-stream"     version="~>1.1.1"
+   dependency           "vibe-stream:tls" version="~>1.1.1"
+   subConfiguration     "vibe-stream:tls" "openssl"
+   dependency           "openssl"         version="~>3.1"
 }
 
 configuration "app-no-tls" {
-   targetType			"executable"
-   targetName			"dnslookup"
-   mainSourceFile		"source/app.d"
+   targetType           "executable"
+   targetName           "dnslookup"
+   mainSourceFile       "source/app.d"
 }
