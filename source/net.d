@@ -37,7 +37,7 @@ struct DnsNetConfig
   string      server          = "127.0.0.1";
   string      serverName      = "";
 
-  bool        trusted         = true;
+  bool        trusted         = false;
   string      trustedCertificateFile  = "/etc/ssl/certs/ca-certificates.crt";
 
   ushort      udpTcpPort      =  53;
@@ -228,7 +228,7 @@ dnsQueryResult tcpQuery(ref DnsNetConfig netConfig, const ref ubyte[] requestDat
 
     immutable string bind_interface = null;
     immutable ushort bind_port      = cast(ushort)0u;
-    
+
     myTcpConnection = connectTCP(netConfig.server, netConfig.udpTcpPort, bind_interface, bind_port, netConfig.timeout);
   }
   catch (Exception e)
@@ -322,6 +322,7 @@ dnsQueryResult tlsQuery(ref DnsNetConfig netConfig, const ref ubyte[] requestDat
   netStat.requestSize   = requestData.length;
   netStat.protocol      = Protocol.tls;
   netStat.server        = netConfig.server;
+  netStat.trusted       = netConfig.trusted;
 
   netStat.port          = netConfig.tlsPort;
   netStat.timestamp     = cast(DateTime)(Clock.currTime());
@@ -379,25 +380,32 @@ dnsQueryResult tlsQuery(ref DnsNetConfig netConfig, const ref ubyte[] requestDat
     // 2) Check the certificate for basic validity.
     // 3) Validate the actual peer name/address against the certificate.
     // 4) Requires that the certificate or any parent certificate is trusted.
+    // Note: trustedCert = validCert + checkTrust
     tlsCtx.peerValidationMode = TLSPeerValidationMode.trustedCert;                    // FULL CHECK OF CERTIFICATE
+    tlsCtx.useTrustedCertificateFile(netConfig.trustedCertificateFile);
   }
-  else if (netConfig.serverName == "")
-  {
-    // TLSPeerValidationMode.checkCert|requireCert forces:
-    // 1) Require the peer to always present a certificate.
-    // 2) Check the certificate for basic validity.
-    tlsCtx.peerValidationMode = TLSPeerValidationMode.checkCert | TLSPeerValidationMode.requireCert;  // ONLY BASIC CHECK OF CERTIFICATE
-  }
-  else
+
+  // netConfig.trusted == false && netConfig.serverName != ""
+  else if (netConfig.serverName != "")
   {
     // TLSPeerValidationMode.validCert forces:
     // 1) Require the peer to always present a certificate.
     // 2) Check the certificate for basic validity.
     // 3) Validate the actual peer name/address against the certificate.
-    tlsCtx.peerValidationMode = TLSPeerValidationMode.validCert;                    // ONLY BASIC CHECK OF CERTIFICATE
+    // Note: validCert = requireCert + checkCert + checkPeer
+    tlsCtx.peerValidationMode = TLSPeerValidationMode.validCert;                    // ONLY BASIC CHECK AND VALIDATION OF CERTIFICATE
   }
 
-  tlsCtx.useTrustedCertificateFile(netConfig.trustedCertificateFile);
+  // netConfig.trusted == false and netConfig.serverName == ""
+  else
+  {
+    // TLSPeerValidationMode.requireCert|checkCert forces:
+    // 1) Require the peer to always present a certificate.
+    // 2) Check the certificate for basic validity.
+    tlsCtx.peerValidationMode = TLSPeerValidationMode.requireCert | TLSPeerValidationMode.checkCert;  // ONLY BASIC CHECK OF CERTIFICATE
+  }
+
+  //tlsCtx.useTrustedCertificateFile(netConfig.trustedCertificateFile);
 
   try
   {

@@ -35,7 +35,7 @@ struct DnsOptions
   string    server            = "127.0.0.1";
   string    serverName        = "";
 
-  bool      trusted           = true;
+  bool      trusted           = false;
   string    trustedCertificateFile  = "/etc/ssl/certs/ca-certificates.crt";
 
   ushort    udpTcpPort        =  53;

@@ -36,9 +36,12 @@ Separate functions to generate request, query resolver server, parse query & res
 	./dnslookup --name www.yahoo.com --type A  --server 8.8.8.8 --udptcpport  53 --protocol udptcp --recursiondesired=false
 
 ### Reverse lookup
-	./dnslookup --name 1.2.3.4       --reverse --server 8.8.8.8 --udptcpport  53 --protocol tcp
+	./dnslookup --name 8.8.8.8       --reverse --server 8.8.8.8 --udptcpport  53 --protocol tcp
 
-### Raw request output and input.
+### Skip network part - only parse query
+	./dnslookup --name www.yahoo.com --type A  --server 8.8.8.8 --udptcpport  53 --protocol none
+
+### Raw request output and input
 Output raw request and response messages
 
 	./dnslookup --name www.yahoo.com --type A  --server 8.8.8.8  --protocol udp --printdata
@@ -47,9 +50,9 @@ Use raw request message for lookup.
 
 	echo "5b1f0100000100000000000003777777057961686f6f03636f6d0000010001" | ./dnslookup --hexstdin
 
-Use raw response message without lookup. This will parse the response message (see 'QR: response') even though it says 'PRINTING REQUEST MESSAGE' and 'VALIDATING REQUEST MESSAGE: header_wrong_query_response'.
+Use raw request or response message without lookup. This will parse the request or response message (see 'QR' for which one) even though it always says 'PRINTING REQUEST MESSAGE' and 'VALIDATING REQUEST MESSAGE.
 
-	echo "5b1f8180000100030000000003777777057961686f6f03636f6d0000010001c00c000500010000003500140b6e65772d66702d73686564037767310162c010c02b0001000100000011000457f864d8c02b0001000100000011000457f864d7" | ./dnslookup --hexstdin --protocol none
+	echo "5b1f8180000100030000000003777777057961686f6f03636f6d0000010001c00c000500010000002300210e6d652d796370692d63662d77777703673036087961686f6f646e73036e657400c02b00010001000000230004bc7d5eccc02b00010001000000230004bc7d5ece"  | ./dnslookup --hexstdin --protocol none
 
 ### Resolver server certificate checks
 Different levels of certificate check in order from loose to strict
@@ -57,6 +60,14 @@ Different levels of certificate check in order from loose to strict
 	./dnslookup --name www.yahoo.com --type A  --server 8.8.8.8 --tlsport    853 --protocol tls --trusted=false
 	./dnslookup --name www.yahoo.com --type A  --server 8.8.8.8 --tlsport    853 --protocol tls --trusted=false --servername "dns.google"
 	./dnslookup --name www.yahoo.com --type A  --server 8.8.8.8 --tlsport    853 --protocol tls --trusted=true  --servername "dns.google" --trustedcertfile "/etc/ssl/certs/ca-certificates.crt"
+
+For trusted==false without servername: Require peer to always present a certificate and check certificate for basic validity.
+For trusted==false with servername: As above and also validate actual peer name/address against certificate.
+For trusted==true requires both servername and trustedcertfile: As above and also requires that certificate or any parent certificate is trusted.
+
+## Command line examples
+------------
+The above command line examples are also listed in a bash script: commandlineexamples.sh
 
 ## Makefile
 ------------
@@ -68,3 +79,4 @@ or
 
 ### Run unittests
 	make testall
+

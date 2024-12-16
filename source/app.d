@@ -91,25 +91,25 @@ bool getOptions(ref string[] args, ref DnsOptions dnsOptions)
     helpInformation = getopt(
       args,
       std.getopt.config.noPassThrough,
-      "name",             "domain name",                                &dnsOptions.name,
+      "name",             "Domain name",                                &dnsOptions.name,
       "type",             "A, MX, PTR etc (A)",                         &dnsOptions.type,
-      "recursiondesired", "recursive query (true)",                     &dnsOptions.recursionDesired,
-      "reverse",          "reverse query (false)",                      &dnsOptions.reverse,
+      "recursiondesired", "Recursive query (true)",                     &dnsOptions.recursionDesired,
+      "reverse",          "Reverse query (false)",                      &dnsOptions.reverse,
 
-      "hexstdin",         "accept hexencoded message on stdin (false)", &dnsOptions.hexStdin,
+      "hexstdin",         "Accept hexencoded message on stdin (false)", &dnsOptions.hexStdin,
 
-      "protocol",         "name server protocol: udp, tcp, udptcp, tls, tlstcp or none (none)", &dnsOptions.protocol,
-      "server",           "name server address or name (127.0.0.1)",    &dnsOptions.server,
-      "servername",       "certificate name of server",                 &dnsOptions.serverName,
+      "protocol",         "Name server protocol: udp, tcp, udptcp, tls, tlstcp or none (none)", &dnsOptions.protocol,
+      "server",           "Name server address or name (127.0.0.1)",    &dnsOptions.server,
+      "servername",       "Certificate name of server",                 &dnsOptions.serverName,
 
-      "trusted",          "require trusted chain of certificates (true)", &dnsOptions.trusted,
-      "trustedcertfile",  "list of trusted certificates (/etc/ssl/certs/ca-certificates.crt)", &dnsOptions.trustedCertificateFile,
+      "trusted",          "Require trusted chain of certificates (false)", &dnsOptions.trusted,
+      "trustedcertfile",  "Rist of trusted certificates (/etc/ssl/certs/ca-certificates.crt)", &dnsOptions.trustedCertificateFile,
 
-      "udptcpport",       "name server port (53)",                      &dnsOptions.udpTcpPort,
-      "tlsport",          "name server port (853)",                     &dnsOptions.tlsPort,
+      "udptcpport",       "Name server port (53)",                      &dnsOptions.udpTcpPort,
+      "tlsport",          "Name server port (853)",                     &dnsOptions.tlsPort,
 
       "printdata",        "Print request and response raw data (false)", &dnsOptions.printData,
-      //"printparsing", "Print parsing debug info (false)",             &dnsOptions.printParsing,  // Used for debugging
+      //"printparsing",   "Print parsing debug info (false)",            &dnsOptions.printParsing,  // Used for debugging
 
       "verbose|v",        "Prints more info (false)",                   &dnsOptions.verbose,
       "quiet|q",          "Prints less info (false)",                   &dnsOptions.quiet,
@@ -250,8 +250,13 @@ int main(string[] args)
     requestMessage.print();
   }
 
-  auto validateCodeQuery = requestMessage.validate(dnsHeaderFlagQueryResponse.query);
-  writefln("\nVALIDATING REQUEST MESSAGE: %s", messageValidateCodeToString(validateCodeQuery));
+  if ((dnsOptions.protocol == Protocol.none) && dnsOptions.hexStdin)
+  {
+    // Used message's own queryResponse flag in order to avoid misguiding validation error 'header_wrong_query_response'
+    // when parsing an already generated response message using option --hexstdin
+    auto validateCodeQuery = requestMessage.validate(requestMessage.header.flags.queryResponse ? dnsHeaderFlagQueryResponse.response : dnsHeaderFlagQueryResponse.query);
+    writefln("\nVALIDATING REQUEST MESSAGE: %s", messageValidateCodeToString(validateCodeQuery));
+  }
 
   // ------------
 
@@ -260,6 +265,9 @@ int main(string[] args)
     writeln("\nSKIPPING NET");
     return EXIT_SUCCESS;
   }
+
+  auto validateCodeQuery = requestMessage.validate(dnsHeaderFlagQueryResponse.query);
+  writefln("\nVALIDATING REQUEST MESSAGE: %s", messageValidateCodeToString(validateCodeQuery));
 
   ubyte[] responseData;
 
@@ -344,8 +352,8 @@ int main(string[] args)
 
   if (validateCodeResponse == dnsMessageValidateCode.success)
   {
-    return EXIT_FAILURE;
+    return EXIT_SUCCESS;
   }
 
-  return EXIT_SUCCESS;
+  return EXIT_FAILURE;
 }  // main
